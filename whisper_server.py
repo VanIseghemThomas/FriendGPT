@@ -18,11 +18,15 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_bytes()
-            # We will need to save it to a temporary file and then transcribe it
-            # We will then send the result back to the client
-            # For now, we will just print the result
-            prediction, duration = transcriber.transcribe(data)
-            print(transcriber.format_output(prediction, duration))
+            try:
+                # We will need to save it to a temporary file and then transcribe it
+                # We will then send the result back to the client
+                # For now, we will just print the result
+                prediction, duration = transcriber.transcribe(data)
+                print(transcriber.format_output(prediction, duration))
+                
+            except Exception as e:
+                print(e)
             
     except WebSocketDisconnect:
         print("Client disconnected")

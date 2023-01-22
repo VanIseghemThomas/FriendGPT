@@ -46,8 +46,8 @@ class WhisperTranscriber:
         start = perf_counter()
 
         self._audio_to_temp(audio)
-        result = self._audio_model.transcribe(self._audio_export, language='english')
-        
+        result = self._audio_model.transcribe(self._audio_export, language='english', fp16=False)
+
         duration = perf_counter() - start
 
         return result, duration
@@ -60,9 +60,4 @@ class WhisperTranscriber:
     def format_output(self, prediction, duration):
         predicted_text = prediction["text"]
         return "Prediction: " + predicted_text + " | delay: " + "{:.2f}".format(duration) + "s"
-
-    def __del__(self):
-        os.remove(self._audio_export)
-        os.rmdir(self._temp_dir)
-
     
