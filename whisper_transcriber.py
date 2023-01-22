@@ -28,27 +28,41 @@ class WhisperTranscriber:
 
         return r
 
-
     def start_transcribing(self, verbose=True, callback=None):
         with sr.Microphone(sample_rate=16000) as source:
             print("---------- Whisper initialized! ----------")
             while True:
                 audio = self._recognizer.listen(source)
 
-                start = perf_counter()
-                data = io.BytesIO(audio.get_wav_data())
-                audio = AudioSegment.from_file(data)
-                audio.export(self._audio_export, format="wav")
-
-                result = self._audio_model.transcribe(self._audio_export, language='english')
+                result, duration = self.transcribe(audio.get_wav_data())
 
                 if callback:
                     callback(result)
 
-                predicted_text = result["text"]
-                duration = perf_counter() - start
-
                 if verbose:
-                    print("Prediction: " + predicted_text + " | delay: ", "{:.2f}".format(duration), "s")
+                    print(self.format_output(result, duration))
 
+    def transcribe(self, audio):
+        start = perf_counter()
+
+        self._audio_to_temp(audio)
+        result = self._audio_model.transcribe(self._audio_export, language='english')
         
+        duration = perf_counter() - start
+
+        return result, duration
+
+    def _audio_to_temp(self, audio):
+        data = io.BytesIO(audio)
+        audio = AudioSegment.from_file(data)
+        audio.export(self._audio_export, format="wav")
+
+    def format_output(self, prediction, duration):
+        predicted_text = prediction["text"]
+        return "Prediction: " + predicted_text + " | delay: " + "{:.2f}".format(duration) + "s"
+
+    def __del__(self):
+        os.remove(self._audio_export)
+        os.rmdir(self._temp_dir)
+
+    
