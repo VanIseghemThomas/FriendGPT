@@ -7,10 +7,6 @@
 import fastapi
 from fastapi import WebSocket, WebSocketDisconnect
 import whisper_transcriber as wt
-import tempfile
-import os
-from pydub import AudioSegment
-import io
 
 app = fastapi.FastAPI()
 transcriber = wt.WhisperTranscriber("base")
