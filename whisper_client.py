@@ -3,8 +3,6 @@
 import speech_recognition as sr
 import websockets
 import asyncio
-from pydub import AudioSegment
-import io
 
 r = sr.Recognizer()
 r.energy_threshold = 500
